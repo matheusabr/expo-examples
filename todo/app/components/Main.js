@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import {
   StyleSheet,
   View,
@@ -8,33 +8,76 @@ import {
   TouchableOpacity
 } from "react-native";
 
-export default class App extends React.Component {
+import Task from "./Task";
+
+export default class Main extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      tasks: [],
+      task: ""
+    };
+  }
   render() {
+    let tasks = this.state.tasks.map((val, key) => {
+      return (
+        <Task
+          key={key}
+          keyVal={key}
+          val={val}
+          handleDelete={() => this.handleDelete(key)}
+        />
+      );
+    });
+
     return (
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerText}>TO DO</Text>
         </View>
-        <ScrollView style={styles.scrollContainer} />
+        <ScrollView style={styles.scrollContainer}>{tasks}</ScrollView>
         <View style={styles.footer}>
           <TextInput
             style={styles.textInput}
+            onChangeText={task => this.setState({ task })}
+            value={this.state.task}
             placeholder="New task..."
             placeholderTextColor="white"
             underlineColorAndroid="transparent"
           />
         </View>
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={this.handleAddTask.bind(this)}
+        >
           <Text style={styles.addButtonText}>+</Text>
         </TouchableOpacity>
       </View>
     );
   }
+  handleAddTask() {
+    if (this.state.task) {
+      const d = new Date();
+      const date = `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+      const tasks = [...this.state.tasks];
+      tasks.push({ date, task: this.state.task });
+      this.setState({
+        tasks,
+        task: ""
+      });
+    }
+  }
+
+  handleDelete(key) {
+    const tasks = [...this.state.tasks];
+    tasks.splice(key, 1);
+    this.setState({ tasks });
+  }
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ccc"
+    backgroundColor: "#fff"
   },
   header: {
     backgroundColor: "#64C879",
